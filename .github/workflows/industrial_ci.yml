@@ -14,12 +14,8 @@ jobs:
       fail-fast: false
       matrix:
         env:
-          - { ROS_DISTRO: humble,  ROS_REPO: main    }
-          - { ROS_DISTRO: humble,  ROS_REPO: testing  }
           - { ROS_DISTRO: jazzy,   ROS_REPO: main    }
           - { ROS_DISTRO: jazzy,   ROS_REPO: testing  }
-          - { ROS_DISTRO: rolling, ROS_REPO: main    }
-          - { ROS_DISTRO: rolling, ROS_REPO: testing  }
     steps:
       - uses: actions/checkout@v4
       - uses: ros-industrial/industrial_ci@master
