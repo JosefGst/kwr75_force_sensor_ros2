@@ -1,5 +1,7 @@
 # KWR75 Force Sensor ROS2
 
+[![CI](https://github.com/JosefGst/kwr75_force_sensor_ros2/actions/workflows/industrial_ci.yml/badge.svg)](https://github.com/JosefGst/kwr75_force_sensor_ros2/actions/workflows/industrial_ci.yml)
+
 This repository contains a ROS2 driver for reading data from the Six Axis Force/Torque Sensor KWR75 Series integrated with ros2_control.
 
 Currently tested on Ubuntu 22.04 and ROS2 Humble only.

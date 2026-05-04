@@ -1,0 +1,26 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+  schedule:
+    - cron: '0 0 * * 0'  # weekly on Sunday at midnight UTC
+
+jobs:
+  industrial_ci:
+    name: "${{ matrix.env.ROS_DISTRO }} / ${{ matrix.env.ROS_REPO }}"
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        env:
+          - { ROS_DISTRO: humble,  ROS_REPO: main    }
+          - { ROS_DISTRO: humble,  ROS_REPO: testing  }
+          - { ROS_DISTRO: jazzy,   ROS_REPO: main    }
+          - { ROS_DISTRO: jazzy,   ROS_REPO: testing  }
+          - { ROS_DISTRO: rolling, ROS_REPO: main    }
+          - { ROS_DISTRO: rolling, ROS_REPO: testing  }
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ros-industrial/industrial_ci@master
+        env: ${{ matrix.env }}
