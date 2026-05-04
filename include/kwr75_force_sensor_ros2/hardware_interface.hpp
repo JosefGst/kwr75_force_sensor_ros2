@@ -54,7 +54,8 @@ public:
 
   std::vector<hardware_interface::StateInterface> export_state_interfaces() override;
 
-  hardware_interface::CallbackReturn on_configure(const rclcpp_lifecycle::State& previous_state) final;
+  hardware_interface::CallbackReturn on_configure(
+    const rclcpp_lifecycle::State & previous_state) final;
 
   hardware_interface::CallbackReturn on_activate(
     const rclcpp_lifecycle::State & previous_state) override;
@@ -62,13 +63,13 @@ public:
   hardware_interface::CallbackReturn on_deactivate(
     const rclcpp_lifecycle::State & previous_state) override;
 
-  hardware_interface::CallbackReturn on_cleanup(const rclcpp_lifecycle::State& previous_state) final;
+  hardware_interface::CallbackReturn on_cleanup(
+    const rclcpp_lifecycle::State & previous_state) final;
 
   hardware_interface::return_type read(
     const rclcpp::Time & time, const rclcpp::Duration & period) override;
 
 private:
-
   // callback for when serial data are received
   void receive_callback(const std::vector<uint8_t> & buffer, const size_t & bytes_transferred);
 
@@ -84,8 +85,8 @@ private:
   // sensor data
   std::vector<uint8_t> data;
   // constants for sending serial start and stop commands to sensor (according to datasheet)
-  const std::vector<uint8_t> START_COMMAND = { 0x48, 0xAA, 0x0D, 0x0A };
-  const std::vector<uint8_t> STOP_COMMAND = { 0x43, 0xAA, 0x0D, 0x0A };
+  const std::vector<uint8_t> START_COMMAND = {0x48, 0xAA, 0x0D, 0x0A};
+  const std::vector<uint8_t> STOP_COMMAND = {0x43, 0xAA, 0x0D, 0x0A};
   // buffer for received data
   std::vector<uint8_t> received_data_buffer;
   // flag to indicate last time data was received

@@ -44,8 +44,7 @@ KWR75ForceSensorHardwareInterface::export_state_interfaces()
   std::vector<hardware_interface::StateInterface> state_interfaces;
 
   // export sensor state interface
-  for (uint i = 0; i < info_.sensors[0].state_interfaces.size(); i++)
-  {
+  for (uint i = 0; i < info_.sensors[0].state_interfaces.size(); i++) {
     // use hw_sensor_states as storage for the sensor states
     state_interfaces.emplace_back(hardware_interface::StateInterface(
       info_.sensors[0].name, info_.sensors[0].state_interfaces[i].name, &hw_sensor_states[i]));
@@ -55,7 +54,7 @@ KWR75ForceSensorHardwareInterface::export_state_interfaces()
 }
 
 hardware_interface::CallbackReturn
-KWR75ForceSensorHardwareInterface::on_configure(const rclcpp_lifecycle::State& previous_state)
+KWR75ForceSensorHardwareInterface::on_configure(const rclcpp_lifecycle::State & previous_state)
 {
   // setup serial driver
   // get the com port and baud rate from the hardware info
@@ -112,7 +111,7 @@ hardware_interface::CallbackReturn KWR75ForceSensorHardwareInterface::on_activat
   auto start_time = std::chrono::steady_clock::now();
 
   // wait for new data to be received (until the time data was received changes)
-  while (current_receive_time == new_receive_time){
+  while (current_receive_time == new_receive_time) {
     // Send the command to start data conversion
     driver->port()->send(START_COMMAND);
     std::this_thread::sleep_for(std::chrono::milliseconds(10));
@@ -132,7 +131,7 @@ hardware_interface::CallbackReturn KWR75ForceSensorHardwareInterface::on_activat
         "No data received from the sensor for more than 1 second!");
       return hardware_interface::CallbackReturn::ERROR;
     }
-  } 
+  }
 
   RCLCPP_INFO(
     rclcpp::get_logger("KWR75ForceSensorHardwareInterface"), "Successfully activated!");
@@ -153,14 +152,15 @@ hardware_interface::CallbackReturn KWR75ForceSensorHardwareInterface::on_deactiv
 }
 
 hardware_interface::CallbackReturn
-KWR75ForceSensorHardwareInterface::on_cleanup(const rclcpp_lifecycle::State& previous_state)
+KWR75ForceSensorHardwareInterface::on_cleanup(const rclcpp_lifecycle::State & previous_state)
 {
   // Send the command to stop data conversion
   driver->port()->send(STOP_COMMAND);
   // close the serial port
   driver->port()->close();
 
-  RCLCPP_INFO(rclcpp::get_logger("KWR75ForceSensorHardwareInterface"), "System successfully stopped!");
+  RCLCPP_INFO(rclcpp::get_logger("KWR75ForceSensorHardwareInterface"),
+      "System successfully stopped!");
 
   return hardware_interface::CallbackReturn::SUCCESS;
 }
@@ -171,17 +171,18 @@ hardware_interface::return_type KWR75ForceSensorHardwareInterface::read(
   // receive data from sensor
   std::unique_lock<std::mutex> data_lock(data_mutex);
   // cast the data to float and convert from Kg to N
-  float fx = *reinterpret_cast<float*>(&data[2]) * GRAVITY;
-  float fy = *reinterpret_cast<float*>(&data[6]) * GRAVITY;
-  float fz = *reinterpret_cast<float*>(&data[10]) * GRAVITY;
+  float fx = *reinterpret_cast<float *>(&data[2]) * GRAVITY;
+  float fy = *reinterpret_cast<float *>(&data[6]) * GRAVITY;
+  float fz = *reinterpret_cast<float *>(&data[10]) * GRAVITY;
   // cast the data to float and convert from Kgm to Nm
-  float mx = *reinterpret_cast<float*>(&data[14]) * GRAVITY;
-  float my = *reinterpret_cast<float*>(&data[18]) * GRAVITY;
-  float mz = *reinterpret_cast<float*>(&data[22]) * GRAVITY;
+  float mx = *reinterpret_cast<float *>(&data[14]) * GRAVITY;
+  float my = *reinterpret_cast<float *>(&data[18]) * GRAVITY;
+  float mz = *reinterpret_cast<float *>(&data[22]) * GRAVITY;
   data_lock.unlock();
 
   // check if data is NaN or out of range
-  if (std::isnan(fx) || std::isnan(fy) || std::isnan(fz) || std::isnan(mx) || std::isnan(my) || std::isnan(mz))
+  if (std::isnan(fx) || std::isnan(fy) || std::isnan(fz) || std::isnan(mx) || std::isnan(my) ||
+    std::isnan(mz))
   {
     RCLCPP_ERROR(
       rclcpp::get_logger("KWR75ForceSensorHardwareInterface"),
@@ -191,7 +192,7 @@ hardware_interface::return_type KWR75ForceSensorHardwareInterface::read(
 
   // check if data is out of range
   if (std::abs(fx) > MAX_FORCE || std::abs(fy) > MAX_FORCE || std::abs(fz) > MAX_FORCE ||
-      std::abs(mx) > MAX_TORQUE || std::abs(my) > MAX_TORQUE || std::abs(mz) > MAX_TORQUE)
+    std::abs(mx) > MAX_TORQUE || std::abs(my) > MAX_TORQUE || std::abs(mz) > MAX_TORQUE)
   {
     RCLCPP_ERROR(
       rclcpp::get_logger("KWR75ForceSensorHardwareInterface"),
@@ -206,7 +207,7 @@ hardware_interface::return_type KWR75ForceSensorHardwareInterface::read(
   hw_sensor_states[3] = mx;
   hw_sensor_states[4] = my;
   hw_sensor_states[5] = mz;
-  
+
   // get the last time data was received
   std::unique_lock<std::mutex> time_lock(time_mutex);
   std::chrono::steady_clock::time_point last_receive = last_receive_time;
@@ -235,20 +236,23 @@ void KWR75ForceSensorHardwareInterface::receive_callback(
   time_lock.unlock();
 
   // Append received data to the buffer
-  received_data_buffer.insert(received_data_buffer.end(), buffer.begin(), buffer.begin() + bytes_transferred);
+  received_data_buffer.insert(received_data_buffer.end(), buffer.begin(),
+      buffer.begin() + bytes_transferred);
 
   // Define the start and end markers
   const uint8_t start_marker[] = {0x48, 0xAA};
   const uint8_t end_marker[] = {0x0D, 0x0A};
 
   // Find the last occurrence of the end marker
-  auto end_pos = std::find_end(received_data_buffer.begin(), received_data_buffer.end(), end_marker, end_marker + 2);
+  auto end_pos = std::find_end(received_data_buffer.begin(), received_data_buffer.end(), end_marker,
+      end_marker + 2);
 
   // Check if the end marker is found
   if (end_pos != received_data_buffer.end()) {
-    
+
     // Search for the start marker within the range before the end marker
-    auto start_pos = std::find_end(received_data_buffer.begin(), end_pos, start_marker, start_marker + 2);
+    auto start_pos = std::find_end(received_data_buffer.begin(), end_pos, start_marker,
+        start_marker + 2);
 
     // Check if the start marker is found
     if (start_pos != end_pos) {
@@ -261,7 +265,7 @@ void KWR75ForceSensorHardwareInterface::receive_callback(
         std::unique_lock<std::mutex> data_lock(data_mutex);
         std::copy(start_pos, start_pos + message_length, data.begin());
         data_lock.unlock();
-      } 
+      }
     }
     // clear anything before the end marker
     received_data_buffer.erase(received_data_buffer.begin(), end_pos + 2);
